@@ -1,0 +1,12 @@
+# Exclude virtual environments, cache, and temporary files
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+.env.*
+*.sqlite3
+.DS_Store
+.idea/
+.vscode/
