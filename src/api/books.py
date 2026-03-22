@@ -7,7 +7,7 @@ from src.models.books import BookModel
 from src.schemas.books import BookAddSchema
 
 
-router = APIRouter(prefix="/books", tags=["Books"])
+router = APIRouter()
 
 
 @router.post("/create_tables")
