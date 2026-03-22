@@ -7,6 +7,8 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
+import uvicorn
+
 
 app = FastAPI()
 
@@ -43,12 +45,12 @@ class BookModel(Base):
 
 
 class BookAddSchema(BaseModel):
-    title: str = Field(..., min_length=1, max_length=200, example="The Great Gatsby")
-    author: str = Field(..., min_length=1, max_length=100, example="F. Scott Fitzgerald")
+    title: str = Field(..., min_length=1, max_length=200)
+    author: str = Field(..., min_length=1, max_length=100)
 
 
 class BookSchema(BookAddSchema):
-    id: int = Field(..., example=1)
+    id: int = Field(...)
 
 
 @app.post("/create_tables")
@@ -59,7 +61,7 @@ async def create_tables():
     return {"message": "Tables created successfully"}
 
 
-@app.post("/add_book")
+@app.post("/books")
 async def add_book(data: BookAddSchema, session: SessionDependency):
     new_book = BookModel(title=data.title, author=data.author)
     session.add(new_book)
@@ -68,7 +70,7 @@ async def add_book(data: BookAddSchema, session: SessionDependency):
     return {"message": "Book added successfully"}
 
 
-@app.delete("/delete_book/{book_id}")
+@app.delete("/books/{book_id}")
 async def delete_book(book_id: int, session: SessionDependency):
     book = await session.get(BookModel, book_id)
     if not book:
@@ -78,7 +80,7 @@ async def delete_book(book_id: int, session: SessionDependency):
     return {"message": "Book deleted successfully"}
 
 
-@app.put("/update_book/{book_id}")
+@app.put("/books/{book_id}")
 async def update_book(book_id: int, data: BookAddSchema, session: SessionDependency):
     book = await session.get(BookModel, book_id)
     if not book:
@@ -102,3 +104,7 @@ async def get_book(book_id: int, session: SessionDependency):
 async def get_books(session: SessionDependency):
     books = await session.execute(select(BookModel))
     return books.scalars().all()
+
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
